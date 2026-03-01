@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <h3>{{ $product->name }}</h3>
+<img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="mb-3 rounded" style="max-width:360px;width:100%;height:260px;object-fit:cover;">
 <p class="badge text-bg-secondary">{{ $product->processing_method }}</p>
 <p>{{ $product->description }}</p>
 <p>Stok: {{ $product->stock }}</p>

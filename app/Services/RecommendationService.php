@@ -72,7 +72,7 @@ class RecommendationService
         $profileVector = $this->buildProfileVector($userId);
 
         $results = [];
-        $products = Product::query()->with('terms')->where('is_active', true)->get();
+        $products = Product::query()->with(['terms', 'primaryImage'])->where('is_active', true)->get();
 
         foreach ($products as $product) {
             $productVector = $product->terms->pluck('tf_idf', 'term')->toArray();
@@ -83,6 +83,7 @@ class RecommendationService
             $results[] = [
                 'product_id' => $product->id,
                 'product_name' => $product->name,
+                'image_url' => $product->image_url,
                 'similarity_query' => round($simQuery, 4),
                 'similarity_profile' => round($simProfile, 4),
                 'final_score' => round($final, 4),

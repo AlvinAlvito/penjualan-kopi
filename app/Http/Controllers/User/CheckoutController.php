@@ -11,6 +11,7 @@ use App\Services\InteractionService;
 use App\Services\MidtransService;
 use App\Services\NotificationService;
 use App\Services\PromotionService;
+use App\Services\RajaOngkirService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +23,37 @@ class CheckoutController extends Controller
         private readonly PromotionService $promotionService,
         private readonly NotificationService $notificationService,
     ) {}
+
+    public function provinces(RajaOngkirService $rajaOngkirService)
+    {
+        return response()->json([
+            'data' => $rajaOngkirService->provinces(),
+        ]);
+    }
+
+    public function cities(Request $request, RajaOngkirService $rajaOngkirService)
+    {
+        $provinceId = (string) $request->query('province_id', '');
+        if ($provinceId === '') {
+            return response()->json(['data' => []]);
+        }
+
+        return response()->json([
+            'data' => $rajaOngkirService->cities($provinceId),
+        ]);
+    }
+
+    public function districts(Request $request, RajaOngkirService $rajaOngkirService)
+    {
+        $cityId = (string) $request->query('city_id', '');
+        if ($cityId === '') {
+            return response()->json(['data' => []]);
+        }
+
+        return response()->json([
+            'data' => $rajaOngkirService->districts($cityId),
+        ]);
+    }
 
     public function show(Request $request)
     {
@@ -40,6 +72,12 @@ class CheckoutController extends Controller
     {
         $data = $request->validate([
             'address' => ['required', 'string'],
+            'province_id' => ['required', 'string', 'max:20'],
+            'province_name' => ['required', 'string', 'max:100'],
+            'city_id' => ['required', 'string', 'max:20'],
+            'city_name' => ['required', 'string', 'max:150'],
+            'district_id' => ['required', 'string', 'max:20'],
+            'district_name' => ['required', 'string', 'max:150'],
             'courier' => ['required', 'string', 'max:50'],
             'service' => ['required', 'string', 'max:50'],
             'shipping_cost' => ['required', 'integer', 'min:0'],
@@ -75,8 +113,20 @@ class CheckoutController extends Controller
                 'discount_amount' => $discount,
                 'total' => max($total, 0),
                 'promotion_id' => $promotion?->id,
+                'shipping_province_id' => $data['province_id'],
+                'shipping_province_name' => $data['province_name'],
+                'shipping_city_id' => $data['city_id'],
+                'shipping_city_name' => $data['city_name'],
+                'shipping_district_id' => $data['district_id'],
+                'shipping_district_name' => $data['district_name'],
                 'shipping_address_json' => [
                     'address' => $data['address'],
+                    'province_id' => $data['province_id'],
+                    'province_name' => $data['province_name'],
+                    'city_id' => $data['city_id'],
+                    'city_name' => $data['city_name'],
+                    'district_id' => $data['district_id'],
+                    'district_name' => $data['district_name'],
                     'courier' => $data['courier'],
                     'service' => $data['service'],
                 ],

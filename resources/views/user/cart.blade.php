@@ -2,10 +2,11 @@
 @section('content')
 <h3>Keranjang</h3>
 <table class="table">
-    <thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th><th></th></tr></thead>
+    <thead><tr><th>Gambar</th><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th><th></th></tr></thead>
     <tbody>
         @forelse($cart->items as $item)
             <tr>
+                <td><img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;"></td>
                 <td>{{ $item->product->name }}</td>
                 <td>
                     <form method="post" action="{{ route('cart.update', $item) }}" class="d-flex gap-2">
@@ -21,7 +22,7 @@
                 </td>
             </tr>
         @empty
-            <tr><td colspan="5" class="text-center">Keranjang kosong.</td></tr>
+            <tr><td colspan="6" class="text-center">Keranjang kosong.</td></tr>
         @endforelse
     </tbody>
 </table>

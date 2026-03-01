@@ -16,7 +16,7 @@ class OrderController extends Controller
     public function show(string $invoice)
     {
         $order = Order::query()
-            ->with(['items.product', 'payment', 'shipment', 'promotion'])
+            ->with(['items.product.primaryImage', 'payment', 'shipment', 'promotion'])
             ->where('invoice_no', $invoice)
             ->where('user_id', auth()->id())
             ->firstOrFail();

@@ -16,7 +16,7 @@ class CartController extends Controller
     public function index()
     {
         $cart = $this->getActiveCart();
-        $cart->load('items.product');
+        $cart->load('items.product.primaryImage');
         return view('user.cart', compact('cart'));
     }
 

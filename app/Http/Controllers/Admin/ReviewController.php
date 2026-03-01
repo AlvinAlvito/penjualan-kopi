@@ -9,7 +9,7 @@ class ReviewController extends Controller
 {
     public function index()
     {
-        $reviews = Review::query()->with(['user', 'product'])->latest()->paginate(20);
+        $reviews = Review::query()->with(['user', 'product.primaryImage'])->latest()->paginate(20);
 
         return view('admin.reviews.index', compact('reviews'));
     }

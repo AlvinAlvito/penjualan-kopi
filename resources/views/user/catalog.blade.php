@@ -16,7 +16,9 @@
 <div class="row g-3">
 @foreach($products as $product)
     <div class="col-md-4">
-        <div class="card h-100"><div class="card-body">
+        <div class="card h-100">
+        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="height:180px;object-fit:cover;">
+        <div class="card-body">
             <h5>{{ $product->name }}</h5>
             <p class="small">{{ Str::limit($product->description, 70) }}</p>
             <p class="fw-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</p>

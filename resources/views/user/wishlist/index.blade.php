@@ -4,7 +4,9 @@
 <div class="row g-3">
 @forelse($items as $item)
     <div class="col-md-4">
-        <div class="card h-100"><div class="card-body">
+        <div class="card h-100">
+        <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" style="height:180px;object-fit:cover;">
+        <div class="card-body">
             <h5>{{ $item->product->name }}</h5>
             <p>{{ Str::limit($item->product->description, 80) }}</p>
             <div class="d-flex gap-2">

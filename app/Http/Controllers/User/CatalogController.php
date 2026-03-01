@@ -18,7 +18,7 @@ class CatalogController extends Controller
 
     public function home()
     {
-        $products = Product::query()->where('is_active', true)->latest()->take(8)->get();
+        $products = Product::query()->with('primaryImage')->where('is_active', true)->latest()->take(8)->get();
         $recommendations = auth()->check()
             ? $this->recommendationService->recommend(auth()->id(), 'kopi gayo segar manis floral', 3)
             : [];
@@ -28,7 +28,7 @@ class CatalogController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::query()->with('category')->where('is_active', true);
+        $query = Product::query()->with(['category', 'primaryImage'])->where('is_active', true);
 
         if ($request->filled('category')) {
             $query->whereHas('category', fn ($q) => $q->where('slug', $request->string('category')));
@@ -60,7 +60,10 @@ class CatalogController extends Controller
             $this->interactionService->log(auth()->id(), 'view', $product->id);
         }
 
-        $product->load(['reviews' => fn ($q) => $q->where('is_published', true)->with('user')->latest()]);
+        $product->load([
+            'primaryImage',
+            'reviews' => fn ($q) => $q->where('is_published', true)->with('user')->latest(),
+        ]);
 
         return view('user.product-detail', compact('product'));
     }

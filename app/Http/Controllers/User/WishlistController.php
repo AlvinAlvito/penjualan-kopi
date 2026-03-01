@@ -11,7 +11,7 @@ class WishlistController extends Controller
     public function index()
     {
         $items = Wishlist::query()
-            ->with('product.category')
+            ->with('product.primaryImage')
             ->where('user_id', auth()->id())
             ->latest()
             ->paginate(12);

@@ -16,10 +16,15 @@
     @endif
 @endif
 <table class="table table-sm">
-    <thead><tr><th>Produk</th><th>Qty</th><th>Subtotal</th></tr></thead>
+    <thead><tr><th>Gambar</th><th>Produk</th><th>Qty</th><th>Subtotal</th></tr></thead>
     <tbody>
         @foreach($order->items as $item)
-            <tr><td>{{ $item->product->name }}</td><td>{{ $item->qty }}</td><td>{{ number_format($item->subtotal, 0, ',', '.') }}</td></tr>
+            <tr>
+                <td><img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;"></td>
+                <td>{{ $item->product->name }}</td>
+                <td>{{ $item->qty }}</td>
+                <td>{{ number_format($item->subtotal, 0, ',', '.') }}</td>
+            </tr>
         @endforeach
     </tbody>
 </table>

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\Promotion;
 use App\Models\User;
 use App\Services\MidtransService;
 use Database\Seeders\CoffeeProductSeeder;
@@ -41,6 +40,12 @@ class PromotionCheckoutTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('checkout.process'), [
             'address' => 'Alamat Test',
+            'province_id' => '11',
+            'province_name' => 'Aceh',
+            'city_id' => '1101',
+            'city_name' => 'Kab. Simeulue',
+            'district_id' => '1101010',
+            'district_name' => 'Teupah Selatan',
             'courier' => 'jne',
             'service' => 'reg',
             'shipping_cost' => 10000,
@@ -54,6 +59,9 @@ class PromotionCheckoutTest extends TestCase
             'user_id' => $user->id,
             'discount_amount' => 10000,
             'total' => 100000,
+            'shipping_province_name' => 'Aceh',
+            'shipping_city_name' => 'Kab. Simeulue',
+            'shipping_district_name' => 'Teupah Selatan',
         ]);
 
         $this->assertDatabaseHas('promotions', [
