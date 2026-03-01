@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout/locations/provinces', [CheckoutController::class, 'provinces'])->name('checkout.locations.provinces');
     Route::get('/checkout/locations/cities', [CheckoutController::class, 'cities'])->name('checkout.locations.cities');
     Route::get('/checkout/locations/districts', [CheckoutController::class, 'districts'])->name('checkout.locations.districts');
+    Route::get('/checkout/shipping-options', [CheckoutController::class, 'shippingOptions'])->name('checkout.shipping-options');
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');

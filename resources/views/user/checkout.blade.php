@@ -37,13 +37,33 @@
             <option value="">Pilih kecamatan</option>
         </select>
     </div>
-    <div class="col-md-4"><input name="courier" class="form-control" placeholder="Kurir" required></div>
-    <div class="col-md-4"><input name="service" class="form-control" placeholder="Service" required></div>
-    <div class="col-md-4"><input name="shipping_cost" type="number" min="0" class="form-control" placeholder="Biaya Kirim" value="{{ old('shipping_cost') }}" required></div>
+    <div class="col-md-4">
+        <label>Kurir</label>
+        <select name="courier" id="courier" class="form-select" required>
+            @foreach(($availableCouriers ?? []) as $courier)
+                <option value="{{ $courier }}" @selected(old('courier', $defaultCourier ?? 'jne') === $courier)>{{ strtoupper($courier) }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label>Service</label>
+        <select name="service" id="service" class="form-select" required disabled>
+            <option value="">Pilih service</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label>Biaya Kirim</label>
+        <input name="shipping_cost" id="shipping_cost" type="number" min="0" class="form-control" placeholder="Biaya Kirim" value="{{ old('shipping_cost', 0) }}" required readonly>
+    </div>
+    <div class="col-12">
+        <small id="shipping_info" class="text-muted">Pilih kabupaten/kota dan kurir untuk melihat opsi ongkir.</small>
+    </div>
     <div class="col-12"><textarea name="note" class="form-control" placeholder="Catatan">{{ old('note') }}</textarea></div>
     <div class="col-12">
         <h6>Subtotal: Rp {{ number_format($cart->items->sum('subtotal'), 0, ',', '.') }}</h6>
         <h6>Diskon: Rp {{ number_format($discount ?? 0, 0, ',', '.') }}</h6>
+        <h6>Ongkir: Rp <span id="shipping_cost_text">{{ number_format((int) old('shipping_cost', 0), 0, ',', '.') }}</span></h6>
+        <h5>Total: Rp <span id="grand_total_text">{{ number_format(($cart->items->sum('subtotal') - ($discount ?? 0) + (int) old('shipping_cost', 0)), 0, ',', '.') }}</span></h5>
         <button class="btn btn-dark">Buat Pesanan</button>
     </div>
 </form>
@@ -57,10 +77,22 @@ document.addEventListener('DOMContentLoaded', async function () {
     const provinceName = document.getElementById('province_name');
     const cityName = document.getElementById('city_name');
     const districtName = document.getElementById('district_name');
+    const courierSelect = document.getElementById('courier');
+    const serviceSelect = document.getElementById('service');
+    const shippingCostInput = document.getElementById('shipping_cost');
+    const shippingInfo = document.getElementById('shipping_info');
+    const shippingCostText = document.getElementById('shipping_cost_text');
+    const grandTotalText = document.getElementById('grand_total_text');
+
+    const subtotalValue = {{ (int) $cart->items->sum('subtotal') }};
+    const discountValue = {{ (int) ($discount ?? 0) }};
 
     const oldProvince = @json(old('province_id'));
     const oldCity = @json(old('city_id'));
     const oldDistrict = @json(old('district_id'));
+    const oldCourier = @json(old('courier', $defaultCourier ?? 'jne'));
+    const oldService = @json(old('service'));
+    const oldShippingCost = Number(@json(old('shipping_cost', 0)));
 
     const resetSelect = (el, placeholder) => {
         el.innerHTML = '';
@@ -96,6 +128,44 @@ document.addEventListener('DOMContentLoaded', async function () {
         hiddenEl.value = selectEl.selectedOptions.length ? selectEl.selectedOptions[0].text : '';
     };
 
+    const formatRupiah = (value) => {
+        const number = Number(value || 0);
+        return number.toLocaleString('id-ID');
+    };
+
+    const updateTotals = () => {
+        const shipping = Number(shippingCostInput.value || 0);
+        shippingCostText.textContent = formatRupiah(shipping);
+        grandTotalText.textContent = formatRupiah(subtotalValue - discountValue + shipping);
+    };
+
+    const setShippingOptions = (options, selectedService = null) => {
+        resetSelect(serviceSelect, 'Pilih service');
+        serviceSelect.disabled = true;
+        shippingCostInput.value = 0;
+
+        if (!options || options.length === 0) {
+            updateTotals();
+            return;
+        }
+
+        options.forEach((option) => {
+            const opt = document.createElement('option');
+            opt.value = option.service;
+            opt.textContent = `${option.service} - ${option.description} (Rp ${formatRupiah(option.cost)} | ETD ${option.etd || '-'})`;
+            opt.dataset.cost = option.cost;
+            if (selectedService && selectedService === option.service) {
+                opt.selected = true;
+            }
+            serviceSelect.appendChild(opt);
+        });
+
+        serviceSelect.disabled = false;
+        const selected = serviceSelect.selectedOptions[0];
+        shippingCostInput.value = selected ? Number(selected.dataset.cost || 0) : 0;
+        updateTotals();
+    };
+
     const provinces = await fetchJson('{{ route('checkout.locations.provinces') }}');
     fillSelect(provinceSelect, provinces, oldProvince);
     syncHiddenText(provinceSelect, provinceName);
@@ -129,18 +199,52 @@ document.addEventListener('DOMContentLoaded', async function () {
         syncHiddenText(districtSelect, districtName);
     };
 
+    const loadShippingOptions = async (cityId, courier, selectedService = null) => {
+        if (!cityId || !courier) {
+            setShippingOptions([]);
+            shippingInfo.textContent = 'Pilih kabupaten/kota dan kurir untuk melihat opsi ongkir.';
+            return;
+        }
+
+        shippingInfo.textContent = 'Menghitung ongkir...';
+        const options = await fetchJson('{{ route('checkout.shipping-options') }}?city_id=' + encodeURIComponent(cityId) + '&courier=' + encodeURIComponent(courier));
+
+        if (!options.length) {
+            setShippingOptions([]);
+            shippingInfo.textContent = 'Ongkir tidak tersedia untuk kombinasi lokasi/kurir ini.';
+            return;
+        }
+
+        setShippingOptions(options, selectedService);
+        const selected = serviceSelect.selectedOptions[0];
+        shippingInfo.textContent = selected ? `Ongkir terpilih: ${selected.textContent}` : 'Pilih service pengiriman.';
+    };
+
     provinceSelect.addEventListener('change', async function () {
         syncHiddenText(provinceSelect, provinceName);
         await loadCities(provinceSelect.value);
+        await loadShippingOptions('', courierSelect.value);
     });
 
     citySelect.addEventListener('change', async function () {
         syncHiddenText(citySelect, cityName);
         await loadDistricts(citySelect.value);
+        await loadShippingOptions(citySelect.value, courierSelect.value);
     });
 
     districtSelect.addEventListener('change', function () {
         syncHiddenText(districtSelect, districtName);
+    });
+
+    courierSelect.addEventListener('change', async function () {
+        await loadShippingOptions(citySelect.value, courierSelect.value);
+    });
+
+    serviceSelect.addEventListener('change', function () {
+        const selected = serviceSelect.selectedOptions[0];
+        shippingCostInput.value = selected ? Number(selected.dataset.cost || 0) : 0;
+        shippingInfo.textContent = selected ? `Ongkir terpilih: ${selected.textContent}` : 'Pilih service pengiriman.';
+        updateTotals();
     });
 
     if (oldProvince) {
@@ -149,6 +253,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (oldCity) {
         await loadDistricts(oldCity, oldDistrict);
+        await loadShippingOptions(oldCity, oldCourier, oldService);
+    } else {
+        updateTotals();
     }
 });
 </script>

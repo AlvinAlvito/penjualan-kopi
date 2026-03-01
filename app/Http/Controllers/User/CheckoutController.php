@@ -55,6 +55,25 @@ class CheckoutController extends Controller
         ]);
     }
 
+    public function shippingOptions(Request $request, RajaOngkirService $rajaOngkirService)
+    {
+        $destinationId = (string) $request->query('city_id', '');
+        $courier = strtolower((string) $request->query('courier', config('services.rajaongkir.default_courier', 'jne')));
+        $originId = (string) config('services.rajaongkir.origin_id', '');
+
+        if ($originId === '' || $destinationId === '') {
+            return response()->json(['data' => []]);
+        }
+
+        $cart = $this->activeCart();
+        $cart->load('items.product');
+        $weight = (int) $cart->items->sum(fn ($item) => max(1, (int) ($item->product->weight_gram ?? 0)) * (int) $item->qty);
+
+        return response()->json([
+            'data' => $rajaOngkirService->shippingOptions($originId, $destinationId, $weight, $courier),
+        ]);
+    }
+
     public function show(Request $request)
     {
         $cart = $this->activeCart();
@@ -65,7 +84,10 @@ class CheckoutController extends Controller
         $subtotal = (int) $cart->items->sum('subtotal');
         $discount = $promotion ? $this->promotionService->calculateDiscount($promotion, $subtotal, $cart->items) : 0;
 
-        return view('user.checkout', compact('cart', 'promotion', 'discount', 'promoCode'));
+        $availableCouriers = ['jne', 'jnt', 'sicepat', 'tiki', 'pos', 'anteraja', 'ninja'];
+        $defaultCourier = (string) config('services.rajaongkir.default_courier', 'jne');
+
+        return view('user.checkout', compact('cart', 'promotion', 'discount', 'promoCode', 'availableCouriers', 'defaultCourier'));
     }
 
     public function process(Request $request)
