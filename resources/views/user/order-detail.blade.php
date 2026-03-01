@@ -1,31 +1,37 @@
 @extends('layouts.app')
 @section('content')
-<h3>Detail Pesanan: {{ $order->invoice_no }}</h3>
-<p>Status: <b>{{ $order->status }}</b></p>
-<p>Total: <b>Rp {{ number_format($order->total, 0, ',', '.') }}</b></p>
-@if($order->discount_amount > 0)
-    <p>Diskon: Rp {{ number_format($order->discount_amount, 0, ',', '.') }}</p>
-@endif
-@if($order->promotion)
-    <p>Promo: <b>{{ $order->promotion->code }}</b></p>
-@endif
-@if($order->payment)
-    <p>Payment status: {{ $order->payment->transaction_status }}</p>
-    @if($order->payment->provider_ref)
-        <p>Snap token: <code>{{ $order->payment->provider_ref }}</code></p>
-    @endif
-@endif
-<table class="table table-sm">
-    <thead><tr><th>Gambar</th><th>Produk</th><th>Qty</th><th>Subtotal</th></tr></thead>
-    <tbody>
-        @foreach($order->items as $item)
-            <tr>
-                <td><img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;"></td>
-                <td>{{ $item->product->name }}</td>
-                <td>{{ $item->qty }}</td>
-                <td>{{ number_format($item->subtotal, 0, ',', '.') }}</td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
+<h3 class="section-title">Detail Pesanan</h3>
+<div class="card-pro mb-3">
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-6"><strong>Invoice:</strong> {{ $order->invoice_no }}</div>
+            <div class="col-md-6"><strong>Status:</strong> <span class="chip">{{ strtoupper($order->status) }}</span></div>
+            <div class="col-md-4"><strong>Subtotal:</strong> Rp {{ number_format($order->subtotal, 0, ',', '.') }}</div>
+            <div class="col-md-4"><strong>Diskon:</strong> Rp {{ number_format($order->discount_amount, 0, ',', '.') }}</div>
+            <div class="col-md-4"><strong>Total:</strong> Rp {{ number_format($order->total, 0, ',', '.') }}</div>
+            @if($order->promotion)
+                <div class="col-md-6"><strong>Promo:</strong> {{ $order->promotion->code }}</div>
+            @endif
+            @if($order->payment)
+                <div class="col-md-6"><strong>Pembayaran:</strong> {{ $order->payment->transaction_status }}</div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<div class="table-pro">
+    <table class="table align-middle">
+        <thead><tr><th>Gambar</th><th>Produk</th><th>Qty</th><th>Subtotal</th></tr></thead>
+        <tbody>
+            @foreach($order->items as $item)
+                <tr>
+                    <td><img src="{{ $item->product->image_url }}" class="product-img" alt="{{ $item->product->name }}"></td>
+                    <td>{{ $item->product->name }}</td>
+                    <td>{{ $item->qty }}</td>
+                    <td>Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
 @endsection

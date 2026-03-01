@@ -1,71 +1,31 @@
-<nav>
-    <div class="logo-name">
-        <span class="logo_name">
-            <img width="50px" src="/images/logo.svg" alt=""> Admin
-        </span>
-    </div>
+<div class="d-flex align-items-center gap-2 mb-3 px-1">
+    <span class="chip"><i class="bi bi-shield-check me-1"></i>Admin</span>
+    <strong>Backoffice</strong>
+</div>
 
-    <div class="menu-items">
-        <ul class="nav-links">
-
-            {{-- ================= ADMIN ================= --}}
-            @if (session('is_admin'))
-
-                <li>
-                    <a href="{{ route('admin.index') }}"
-                       class="{{ Request::is('admin') ? 'active' : '' }}">
-                        <i class="uil uil-estate"></i>
-                        <span class="link-name">Dashboard</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('admin.pemohon.index') }}"
-                       class="{{ Request::is('admin/pemohon*') ? 'active' : '' }}">
-                        <i class="uil uil-users-alt"></i>
-                        <span class="link-name">Data Pemohon</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('admin.antrian.index') }}"
-                       class="{{ Request::is('admin/antrian*') ? 'active' : '' }}">
-                        <i class="uil uil-schedule"></i>
-                        <span class="link-name">Data Antrian</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('admin.kuota.index') }}"
-                       class="{{ Request::is('admin/kuota*') ? 'active' : '' }}">
-                        <i class="uil uil-calendar-alt"></i>
-                        <span class="link-name">Kuota Harian</span>
-                    </a>
-                </li>
-
-            @endif
-        </ul>
-
-        {{-- ================= FOOTER ================= --}}
-        <ul class="logout-mode">
-            @if (session('is_admin'))
-                <li>
-                    <a href="{{ route('logout') }}">
-                        <i class="uil uil-signout"></i>
-                        <span class="link-name">Logout</span>
-                    </a>
-                </li>
-            @endif
-
-            <li class="mode">
-                <a href="#">
-                    <i class="uil uil-moon"></i>
-                    <span class="link-name">Dark Mode</span>
-                </a>
-                <div class="mode-toggle">
-                    <span class="switch"></span>
-                </div>
-            </li>
-        </ul>
-    </div>
+<nav class="d-flex flex-column gap-1">
+    <a class="admin-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a class="admin-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+        <i class="bi bi-tags"></i> Kategori
+    </a>
+    <a class="admin-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
+        <i class="bi bi-box-seam"></i> Produk
+    </a>
+    <a class="admin-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+        <i class="bi bi-receipt"></i> Pesanan
+    </a>
+    <a class="admin-link {{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}" href="{{ route('admin.promotions.index') }}">
+        <i class="bi bi-ticket-perforated"></i> Promo
+    </a>
+    <a class="admin-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}" href="{{ route('admin.reviews.index') }}">
+        <i class="bi bi-chat-left-text"></i> Review
+    </a>
+    <a class="admin-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}" href="{{ route('admin.notifications.index') }}">
+        <i class="bi bi-bell"></i> Notifikasi
+    </a>
+    <a class="admin-link {{ request()->routeIs('admin.recommendation-analytics') ? 'active' : '' }}" href="{{ route('admin.recommendation-analytics') }}">
+        <i class="bi bi-graph-up"></i> Analitik CBF
+    </a>
 </nav>
