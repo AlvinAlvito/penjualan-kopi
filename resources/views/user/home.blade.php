@@ -8,7 +8,7 @@
             <p class="text-white-50 mb-0">Temukan varian rasa yang paling sesuai melalui rekomendasi berbasis preferensi Anda.</p>
         </div>
         <div class="col-lg-4 text-lg-end">
-            <a href="{{ route('catalog.index') }}" class="btn btn-light btn-pill px-4">Lihat Katalog</a>
+            <a href="{{ route('catalog.index') }}" class="btn btn-light btn-pill px-4"><i class="bi bi-arrow-right-circle me-1"></i>Lihat Katalog</a>
         </div>
     </div>
 </div>
@@ -26,7 +26,7 @@
                     <p class="muted small mb-2">{{ Str::limit($product->description, 82) }}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <strong>Rp {{ number_format($product->price, 0, ',', '.') }}</strong>
-                        <a href="{{ route('catalog.show', $product->slug) }}" class="btn btn-sm btn-outline-dark">Detail</a>
+                        <a href="{{ route('catalog.show', $product->slug) }}" class="btn btn-sm btn-outline-dark"><i class="bi bi-eye me-1"></i>Detail</a>
                     </div>
                 </div>
             </article>

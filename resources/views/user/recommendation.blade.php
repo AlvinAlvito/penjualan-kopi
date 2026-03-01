@@ -5,7 +5,7 @@
     <div class="card-body">
         <form method="get" class="row g-2">
             <div class="col-md-9"><input name="query" class="form-control" value="{{ $query }}" placeholder="Contoh: segar fruity aftertaste lembut"></div>
-            <div class="col-md-3 d-grid"><button class="btn btn-primary btn-pill">Proses Rekomendasi</button></div>
+            <div class="col-md-3 d-grid"><button class="btn btn-primary btn-pill"><i class="bi bi-magic me-1"></i>Proses Rekomendasi</button></div>
         </form>
     </div>
 </div>

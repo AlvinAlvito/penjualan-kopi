@@ -16,7 +16,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3 d-grid"><button class="btn btn-primary btn-pill">Filter</button></div>
+            <div class="col-md-3 d-grid"><button class="btn btn-primary btn-pill"><i class="bi bi-funnel me-1"></i>Filter</button></div>
         </form>
     </div>
 </div>
@@ -31,7 +31,7 @@
                 <p class="small muted mb-2">{{ Str::limit($product->description, 88) }}</p>
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>Rp {{ number_format($product->price, 0, ',', '.') }}</strong>
-                    <a href="{{ route('catalog.show', $product->slug) }}" class="btn btn-sm btn-outline-dark">Lihat Detail</a>
+                    <a href="{{ route('catalog.show', $product->slug) }}" class="btn btn-sm btn-outline-dark"><i class="bi bi-eye me-1"></i>Lihat Detail</a>
                 </div>
             </div>
         </article>

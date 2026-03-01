@@ -21,7 +21,7 @@
                         @if(!$notification->read_at)
                             <form method="post" action="{{ route('notifications.read', $notification) }}">
                                 @csrf @method('PATCH')
-                                <button class="btn btn-sm btn-outline-dark">Tandai Dibaca</button>
+                                <button class="btn btn-sm btn-outline-dark"><i class="bi bi-check2-circle me-1"></i>Tandai Dibaca</button>
                             </form>
                         @endif
                     </td>

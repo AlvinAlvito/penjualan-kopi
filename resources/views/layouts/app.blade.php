@@ -174,6 +174,23 @@
             border-color: #dbe3ee;
             min-height: 44px;
         }
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 .18rem rgba(239,68,68,.12) !important;
+        }
+        .form-control.is-valid, .form-select.is-valid {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 .18rem rgba(34,197,94,.12) !important;
+        }
+        .invalid-feedback.auto-feedback {
+            display: block;
+            font-size: .78rem;
+            margin-top: .3rem;
+        }
+        .btn-submit-loading {
+            pointer-events: none;
+            opacity: .86;
+        }
 
         textarea.form-control { min-height: 120px; }
         .form-control:focus, .form-select:focus {
@@ -208,9 +225,11 @@
 
         .page-reveal {
             opacity: 0;
-            transform: translateY(10px);
             animation: reveal .45s ease forwards;
         }
+
+        .modal-backdrop { z-index: 2050 !important; }
+        .modal { z-index: 2060 !important; }
 
         .top-loading {
             position: fixed;
@@ -235,8 +254,101 @@
             box-shadow: var(--shadow);
         }
 
+        .skeleton-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(246,248,251,.86);
+            backdrop-filter: blur(2px);
+            z-index: 1040;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 86px;
+        }
+        [data-theme='dark'] .skeleton-overlay { background: rgba(11,18,32,.8); }
+        .skeleton-overlay.show { display: flex; }
+        .skeleton-frame {
+            width: min(1120px, calc(100vw - 2rem));
+            display: grid;
+            gap: .9rem;
+        }
+        .skeleton-card {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--surface);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .skeleton-line {
+            height: 12px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(148,163,184,.18), rgba(148,163,184,.36), rgba(148,163,184,.18));
+            background-size: 220% 100%;
+            animation: sk 1.2s linear infinite;
+        }
+        .skeleton-line.h18 { height: 18px; }
+        .skeleton-line.w40 { width: 40%; }
+        .skeleton-line.w60 { width: 60%; }
+        .skeleton-line.w80 { width: 80%; }
+        .skeleton-line.w100 { width: 100%; }
+        .skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: .75rem;
+        }
+        .skeleton-box {
+            height: 96px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, rgba(148,163,184,.16), rgba(148,163,184,.3), rgba(148,163,184,.16));
+            background-size: 220% 100%;
+            animation: sk 1.2s linear infinite;
+        }
+
+        @keyframes sk { to { background-position: -220% 0; } }
+
+        .quick-fab-wrap {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 1030;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: .55rem;
+        }
+        .quick-panel {
+            width: 260px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: .75rem;
+            display: none;
+        }
+        .quick-panel.show { display: block; }
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            text-decoration: none;
+            color: var(--text);
+            border-radius: 10px;
+            padding: .5rem .55rem;
+            font-weight: 600;
+        }
+        .quick-link:hover { background: rgba(148,163,184,.14); }
+        .quick-fab {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
+            box-shadow: 0 12px 22px rgba(15,118,110,.35);
+        }
+
         @keyframes reveal {
-            to { opacity: 1; transform: translateY(0); }
+            to { opacity: 1; }
         }
 
         @media (max-width: 991px) {
@@ -255,16 +367,16 @@
         </button>
         <div class="collapse navbar-collapse" id="topNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('catalog.*') ? 'active' : '' }}" href="{{ route('catalog.index') }}">Katalog</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->routeIs('recommendation.*') ? 'active' : '' }}" href="{{ route('recommendation.index') }}">Rekomendasi</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('catalog.*') ? 'active' : '' }}" href="{{ route('catalog.index') }}"><i class="bi bi-grid me-1"></i>Katalog</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('recommendation.*') ? 'active' : '' }}" href="{{ route('recommendation.index') }}"><i class="bi bi-stars me-1"></i>Rekomendasi</a></li>
                 @auth
                     @if(auth()->user()->isAdmin())
                         <li class="nav-item"><a class="nav-link {{ request()->is('admin*') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Admin</a></li>
                     @else
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('cart.*') ? 'active' : '' }}" href="{{ route('cart.index') }}">Keranjang</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('wishlist.*') ? 'active' : '' }}" href="{{ route('wishlist.index') }}">Wishlist</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}" href="{{ route('orders.index') }}">Pesanan</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}" href="{{ route('notifications.index') }}">Notifikasi</a></li>
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('cart.*') ? 'active' : '' }}" href="{{ route('cart.index') }}"><i class="bi bi-cart3 me-1"></i>Keranjang</a></li>
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('wishlist.*') ? 'active' : '' }}" href="{{ route('wishlist.index') }}"><i class="bi bi-heart me-1"></i>Wishlist</a></li>
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}" href="{{ route('orders.index') }}"><i class="bi bi-receipt me-1"></i>Pesanan</a></li>
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}" href="{{ route('notifications.index') }}"><i class="bi bi-bell me-1"></i>Notifikasi</a></li>
                     @endif
                 @endauth
             </ul>
@@ -281,16 +393,16 @@
                 </button>
                 @auth
                     @if(!auth()->user()->isAdmin())
-                        <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-outline-light">Profil</a>
+                        <a href="{{ route('profile.edit') }}" class="btn btn-sm btn-outline-light"><i class="bi bi-person-circle me-1"></i>Profil</a>
                     @endif
                     <span class="text-white small fw-semibold d-none d-md-inline">{{ auth()->user()->name }}</span>
                     <form method="post" action="{{ route('logout') }}">
                         @csrf
-                        <button class="btn btn-sm btn-light">Logout</button>
+                        <button class="btn btn-sm btn-light"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light">Login</a>
-                    <a href="{{ route('register') }}" class="btn btn-sm btn-light">Daftar</a>
+                    <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-sm btn-light"><i class="bi bi-person-plus me-1"></i>Daftar</a>
                 @endauth
             </div>
         </div>
@@ -348,6 +460,39 @@
 </div>
 
 <div id="topLoading" class="top-loading"></div>
+<div id="pageSkeleton" class="skeleton-overlay">
+    <div class="skeleton-frame">
+        <div class="skeleton-card">
+            <div class="skeleton-line h18 w40 mb-2"></div>
+            <div class="skeleton-line w80 mb-2"></div>
+            <div class="skeleton-line w60"></div>
+        </div>
+        <div class="skeleton-grid">
+            <div class="skeleton-box"></div>
+            <div class="skeleton-box"></div>
+            <div class="skeleton-box"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skeleton-line h18 w60 mb-2"></div>
+            <div class="skeleton-line w100 mb-2"></div>
+            <div class="skeleton-line w100 mb-2"></div>
+            <div class="skeleton-line w80"></div>
+        </div>
+    </div>
+</div>
+
+@if($isAdminView)
+<div class="quick-fab-wrap">
+    <div class="quick-panel" id="quickPanel">
+        <div class="small muted fw-semibold mb-1">Quick Actions</div>
+        <a class="quick-link" href="{{ route('admin.products.index') }}#create-product"><i class="bi bi-plus-circle"></i>Tambah Produk</a>
+        <a class="quick-link" href="{{ route('admin.promotions.index') }}#create-promo"><i class="bi bi-ticket-perforated"></i>Buat Promo</a>
+        <a class="quick-link" href="{{ route('admin.orders.index') }}"><i class="bi bi-receipt"></i>Lihat Pesanan</a>
+        <a class="quick-link" href="{{ route('admin.notifications.index') }}"><i class="bi bi-bell"></i>Kirim Notifikasi</a>
+    </div>
+    <button type="button" id="quickFab" class="quick-fab" aria-label="Quick actions"><i class="bi bi-lightning-charge"></i></button>
+</div>
+@endif
 
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -401,6 +546,7 @@
             const form = event.target;
             if (!(form instanceof HTMLFormElement)) return;
             if (!form.matches('[data-confirm]')) return;
+            if (form.dataset.confirmed === '1') return;
             event.preventDefault();
             targetForm = form;
             textEl.textContent = form.getAttribute('data-confirm') || 'Lanjutkan aksi ini?';
@@ -412,7 +558,12 @@
                 const f = targetForm;
                 targetForm = null;
                 modal.hide();
-                f.submit();
+                f.dataset.confirmed = '1';
+                if (typeof f.requestSubmit === 'function') {
+                    f.requestSubmit();
+                } else {
+                    f.submit();
+                }
             }
         });
 
@@ -422,16 +573,19 @@
         });
 
         const topLoading = document.getElementById('topLoading');
+        const pageSkeleton = document.getElementById('pageSkeleton');
         const beginLoading = () => {
             if (!topLoading) return;
             topLoading.classList.add('show');
             topLoading.classList.remove('done');
+            pageSkeleton?.classList.add('show');
         };
         const endLoading = () => {
             if (!topLoading) return;
             topLoading.classList.add('done');
             setTimeout(() => {
                 topLoading.classList.remove('show', 'done');
+                pageSkeleton?.classList.remove('show');
             }, 220);
         };
 
@@ -446,7 +600,104 @@
             beginLoading();
         });
 
-        document.addEventListener('submit', () => beginLoading());
+        const getAutoMessage = (field) => {
+            const label = field.getAttribute('data-label') || field.getAttribute('placeholder') || field.name || 'Field ini';
+            if (field.validity.valueMissing) return `${label} wajib diisi.`;
+            if (field.validity.typeMismatch) return `${label} tidak valid.`;
+            if (field.validity.patternMismatch) return `${label} tidak sesuai format.`;
+            if (field.validity.tooShort) return `${label} terlalu pendek.`;
+            if (field.validity.tooLong) return `${label} terlalu panjang.`;
+            if (field.validity.rangeUnderflow || field.validity.rangeOverflow) return `${label} di luar batas nilai yang diizinkan.`;
+            return `${label} tidak valid.`;
+        };
+
+        const setFieldFeedback = (field) => {
+            if (!(field instanceof HTMLElement)) return true;
+            if (field.matches('[type="hidden"], [disabled]')) return true;
+            if (!field.matches('input, select, textarea')) return true;
+
+            const parent = field.parentElement;
+            if (!parent) return true;
+            const old = parent.querySelector('.invalid-feedback.auto-feedback');
+            if (old) old.remove();
+
+            if (field.checkValidity()) {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+                return true;
+            }
+
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+            const fb = document.createElement('div');
+            fb.className = 'invalid-feedback auto-feedback';
+            fb.textContent = getAutoMessage(field);
+            parent.appendChild(fb);
+            return false;
+        };
+
+        const enhanceFormSubmitButton = (form) => {
+            const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (!submitBtn || submitBtn.dataset.loadingState === '1') return;
+            submitBtn.dataset.loadingState = '1';
+            const original = submitBtn.innerHTML;
+            submitBtn.classList.add('btn-submit-loading');
+            submitBtn.setAttribute('disabled', 'disabled');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Memproses...';
+            form.dataset.submitOriginalHtml = original;
+        };
+
+        document.addEventListener('input', (event) => {
+            const field = event.target;
+            if (!(field instanceof HTMLElement)) return;
+            if (!field.matches('input, select, textarea')) return;
+            if (field.classList.contains('is-invalid')) setFieldFeedback(field);
+        });
+        document.addEventListener('change', (event) => {
+            const field = event.target;
+            if (!(field instanceof HTMLElement)) return;
+            if (!field.matches('input, select, textarea')) return;
+            if (field.classList.contains('is-invalid')) setFieldFeedback(field);
+        });
+
+        document.addEventListener('submit', (event) => {
+            const form = event.target;
+            if (!(form instanceof HTMLFormElement)) return;
+            if (form.method.toUpperCase() === 'GET') return;
+
+            const fields = Array.from(form.querySelectorAll('input, select, textarea'));
+            let valid = true;
+            fields.forEach((field) => {
+                valid = setFieldFeedback(field) && valid;
+            });
+
+            if (!valid) {
+                event.preventDefault();
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid instanceof HTMLElement) firstInvalid.focus();
+                return;
+            }
+
+            beginLoading();
+            enhanceFormSubmitButton(form);
+        });
+
+        const quickFab = document.getElementById('quickFab');
+        const quickPanel = document.getElementById('quickPanel');
+        quickFab?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            quickPanel?.classList.toggle('show');
+        });
+        document.addEventListener('click', (e) => {
+            if (!quickPanel || !quickFab) return;
+            const target = e.target;
+            if (!(target instanceof Element)) return;
+            if (quickPanel.contains(target) || quickFab.contains(target)) return;
+            quickPanel.classList.remove('show');
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') quickPanel?.classList.remove('show');
+        });
     })();
 </script>
 </body>

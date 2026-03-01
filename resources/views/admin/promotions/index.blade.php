@@ -2,7 +2,7 @@
 @section('content')
 <h3 class="section-title">Manajemen Promo</h3>
 
-<div class="card-pro mb-3">
+<div class="card-pro mb-3" id="create-promo">
     <div class="card-body">
         <form method="post" action="{{ route('admin.promotions.store') }}" class="row g-2">
             @csrf

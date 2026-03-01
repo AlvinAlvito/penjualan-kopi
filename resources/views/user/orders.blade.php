@@ -11,7 +11,7 @@
                     <td><span class="chip">{{ strtoupper($order->status) }}</span></td>
                     <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                     <td>{{ $order->created_at->format('d M Y H:i') }}</td>
-                    <td><a href="{{ route('orders.show', $order->invoice_no) }}" class="btn btn-sm btn-outline-dark">Detail</a></td>
+                    <td><a href="{{ route('orders.show', $order->invoice_no) }}" class="btn btn-sm btn-outline-dark"><i class="bi bi-eye me-1"></i>Detail</a></td>
                 </tr>
             @empty
                 <tr><td colspan="5" class="text-center muted py-4">Belum ada pesanan.</td></tr>

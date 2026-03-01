@@ -18,7 +18,7 @@
                 <textarea name="default_address" class="form-control">{{ $user->default_address }}</textarea>
             </div>
             <div class="col-12 d-grid d-md-flex justify-content-md-end">
-                <button class="btn btn-primary btn-pill px-4">Simpan Profil</button>
+                <button class="btn btn-primary btn-pill px-4"><i class="bi bi-save me-1"></i>Simpan Profil</button>
             </div>
         </form>
     </div>

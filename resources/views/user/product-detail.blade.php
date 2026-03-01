@@ -22,11 +22,11 @@
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="number" min="1" name="qty" value="1" class="form-control" style="max-width:100px;">
-                        <button class="btn btn-primary btn-pill">Tambah Keranjang</button>
+                        <button class="btn btn-primary btn-pill"><i class="bi bi-cart-plus me-1"></i>Tambah Keranjang</button>
                     </form>
                     <form method="post" action="{{ route('wishlist.store', $product->slug) }}">
                         @csrf
-                        <button class="btn btn-outline-dark">Wishlist</button>
+                        <button class="btn btn-outline-dark"><i class="bi bi-heart me-1"></i>Wishlist</button>
                     </form>
                 </div>
                 @endif
@@ -51,7 +51,7 @@
                 </select>
             </div>
             <div class="col-md-8"><input class="form-control" name="review_text" placeholder="Bagaimana pengalaman rasa kopi ini?"></div>
-            <div class="col-md-2 d-grid"><button class="btn btn-primary btn-pill">Kirim</button></div>
+            <div class="col-md-2 d-grid"><button class="btn btn-primary btn-pill"><i class="bi bi-send me-1"></i>Kirim</button></div>
         </form>
     </div>
 </div>

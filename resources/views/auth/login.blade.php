@@ -24,7 +24,7 @@
                         <input type="password" name="password" class="form-control" placeholder="Masukkan password" required>
                     </div>
                     <div class="col-12 d-grid">
-                        <button class="btn btn-primary btn-pill">Masuk</button>
+                        <button class="btn btn-primary btn-pill"><i class="bi bi-box-arrow-in-right me-1"></i>Masuk</button>
                     </div>
                 </form>
                 <p class="muted mt-3 mb-0">Belum punya akun? <a href="{{ route('register') }}" class="link-primary">Daftar sekarang</a></p>

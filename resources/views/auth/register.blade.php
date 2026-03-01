@@ -37,7 +37,7 @@
                         <input type="password" name="password_confirmation" class="form-control" required>
                     </div>
                     <div class="col-12 d-grid">
-                        <button class="btn btn-primary btn-pill">Buat Akun</button>
+                        <button class="btn btn-primary btn-pill"><i class="bi bi-person-plus me-1"></i>Buat Akun</button>
                     </div>
                 </form>
                 <p class="muted mt-3 mb-0">Sudah punya akun? <a href="{{ route('login') }}" class="link-primary">Masuk</a></p>

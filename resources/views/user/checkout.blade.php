@@ -9,7 +9,7 @@
                 <label class="form-label">Kode Promo</label>
                 <input name="promo_code" class="form-control" value="{{ $promoCode ?? '' }}" placeholder="Masukkan kode promo">
             </div>
-            <div class="col-md-3 d-grid"><button class="btn btn-outline-dark">Cek Promo</button></div>
+            <div class="col-md-3 d-grid"><button class="btn btn-outline-dark"><i class="bi bi-ticket-perforated me-1"></i>Cek Promo</button></div>
         </form>
         @if(isset($promotion) && $promotion)
             <div class="alert alert-info mt-3 mb-0 rounded-4 border-0">Promo <strong>{{ $promotion->code }}</strong> aktif. Potongan Rp {{ number_format($discount, 0, ',', '.') }}.</div>
@@ -76,7 +76,7 @@
             </div>
 
             <div class="col-12 d-grid d-md-flex justify-content-md-end">
-                <button class="btn btn-primary btn-pill px-4">Buat Pesanan</button>
+                <button class="btn btn-primary btn-pill px-4"><i class="bi bi-bag-check me-1"></i>Buat Pesanan</button>
             </div>
         </form>
     </div>

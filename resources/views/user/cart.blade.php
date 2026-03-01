@@ -2,7 +2,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="section-title mb-0">Keranjang Belanja</h3>
-    <a href="{{ route('catalog.index') }}" class="btn btn-outline-dark btn-sm">+ Tambah Produk</a>
+    <a href="{{ route('catalog.index') }}" class="btn btn-outline-dark btn-sm"><i class="bi bi-plus-circle me-1"></i>Tambah Produk</a>
 </div>
 
 <div class="table-pro mb-3">
@@ -17,7 +17,7 @@
                         <form method="post" action="{{ route('cart.update', $item) }}" class="d-flex gap-2">
                             @csrf @method('PATCH')
                             <input type="number" min="1" name="qty" value="{{ $item->qty }}" class="form-control" style="max-width:90px">
-                            <button class="btn btn-sm btn-outline-dark">Update</button>
+                            <button class="btn btn-sm btn-outline-dark"><i class="bi bi-arrow-repeat me-1"></i>Update</button>
                         </form>
                     </td>
                     <td>Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
@@ -39,7 +39,7 @@
 <div class="card-pro">
     <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
         <h5 class="mb-0">Total: Rp {{ number_format($cart->items->sum('subtotal'), 0, ',', '.') }}</h5>
-        <a href="{{ route('checkout.show') }}" class="btn btn-primary btn-pill px-4">Lanjut Checkout</a>
+        <a href="{{ route('checkout.show') }}" class="btn btn-primary btn-pill px-4"><i class="bi bi-credit-card me-1"></i>Lanjut Checkout</a>
     </div>
 </div>
 @endsection

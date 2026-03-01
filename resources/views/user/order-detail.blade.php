@@ -34,4 +34,7 @@
         </tbody>
     </table>
 </div>
+<div class="mt-3">
+    <a href="{{ route('orders.index') }}" class="btn btn-outline-dark btn-sm"><i class="bi bi-arrow-left me-1"></i>Kembali ke Pesanan</a>
+</div>
 @endsection
