@@ -28,4 +28,7 @@
     <a class="admin-link {{ request()->routeIs('admin.recommendation-analytics') ? 'active' : '' }}" href="{{ route('admin.recommendation-analytics') }}">
         <i class="bi bi-graph-up"></i> Analitik CBF
     </a>
+    <a class="admin-link {{ request()->routeIs('admin.journal-validation') ? 'active' : '' }}" href="{{ route('admin.journal-validation') }}">
+        <i class="bi bi-journal-check"></i> Validasi Jurnal
+    </a>
 </nav>

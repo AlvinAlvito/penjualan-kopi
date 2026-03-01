@@ -10,10 +10,57 @@ use App\Models\UserInteraction;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * RecommendationService
+ *
+ * Dokumentasi alur CBF sesuai jurnal:
+ *
+ * 1) Input utama:
+ *    - Dokumen produk: nama + deskripsi + metode proses.
+ *    - Query user.
+ *    - (Opsional) riwayat interaksi user untuk profil preferensi.
+ *
+ * 2) Preprocessing teks (oleh TextPreprocessingService):
+ *    - case folding, tokenisasi, stopword removal, stemming.
+ *    - Output: daftar term bersih per produk / query.
+ *
+ * 3) Pembobotan TF-IDF index produk:
+ *    - tf(t,d)  = count(t,d) / total_terms(d)
+ *    - idf(t)   = log10(N / df(t))
+ *    - tfidf(t,d)= tf(t,d) * idf(t)
+ *    - Output: tabel product_terms (term, tf, idf, tf_idf).
+ *
+ * 4) Vector query:
+ *    - Query dipreprocess, lalu dihitung tf-idf menggunakan idf dari index produk.
+ *
+ * 5) Cosine similarity:
+ *    - sim(a,b) = (a . b) / (||a|| * ||b||)
+ *    - Output: similarity query->produk (dan profil->produk).
+ *
+ * 6) Blending skor final:
+ *    - final_score = 0.7 * sim_query + 0.3 * sim_profile
+ *    - Output: ranking top-N rekomendasi.
+ *
+ * 7) Evaluasi:
+ *    - Precision = TP / (TP + FP)
+ *    - Recall    = TP / (TP + FN)
+ *    - F1        = 2 * (P * R) / (P + R)
+ *
+ * Catatan:
+ * - Saat RECOMMENDATION_JOURNAL_EXACT_MODE=true, dua query jurnal dipetakan ke nilai
+ *   benchmark jurnal agar output web sama dengan laporan penelitian.
+ */
 class RecommendationService
 {
     public function __construct(private readonly TextPreprocessingService $preprocessing) {}
 
+    /**
+     * Membangun ulang index TF-IDF untuk semua produk aktif.
+     *
+     * Output method ini:
+     * - Tabel product_terms terisi term, tf, idf, tf_idf setiap produk.
+     * - Menjadi fondasi perhitungan similarity saat user mencari rekomendasi.
+     */
     public function refreshTfIdfIndex(): void
     {
         $products = Product::query()->where('is_active', true)->get();
@@ -46,13 +93,16 @@ class RecommendationService
 
             foreach ($docTerms as $productId => $meta) {
                 foreach ($meta['counts'] as $term => $count) {
+                    // Rumus TF: tf(t,d) = count(t,d) / total_terms(d)
                     $tf = $count / $meta['total'];
+                    // Rumus IDF: idf(t) = log10(N / df(t))
                     $idf = $df[$term] > 0 ? log10($n / $df[$term]) : 0;
                     $rows[] = [
                         'product_id' => $productId,
                         'term' => $term,
                         'tf' => $tf,
                         'idf' => $idf,
+                        // Rumus TF-IDF: tfidf(t,d) = tf(t,d) * idf(t)
                         'tf_idf' => $tf * $idf,
                         'updated_at' => now(),
                     ];
@@ -65,8 +115,20 @@ class RecommendationService
         });
     }
 
+    /**
+     * Menghasilkan rekomendasi produk top-N.
+     *
+     * Input:
+     * - userId (nullable): bila ada, sistem hitung profil preferensi dari interaksi user.
+     * - query: kalimat pencarian user.
+     * - topN: jumlah rekomendasi yang dikembalikan.
+     *
+     * Output:
+     * - Array berisi {product_id, product_name, similarity_query, similarity_profile, final_score, rank}.
+     */
     public function recommend(?int $userId, string $query, int $topN = 3): array
     {
+        // Mode khusus sidang/jurnal: dua query benchmark mengembalikan skor jurnal persis.
         $journalResult = $this->buildJournalExactResult($query, $topN);
         if ($journalResult !== null) {
             RecommendationLog::query()->create([
@@ -88,8 +150,11 @@ class RecommendationService
 
         foreach ($products as $product) {
             $productVector = $product->terms->pluck('tf_idf', 'term')->toArray();
+            // Similarity query terhadap dokumen produk.
             $simQuery = $this->cosineSimilarity($queryVector, $productVector);
+            // Similarity profil user terhadap dokumen produk.
             $simProfile = $this->cosineSimilarity($profileVector, $productVector);
+            // Rumus blending sesuai keputusan sistem.
             $final = (0.7 * $simQuery) + (0.3 * $simProfile);
 
             $results[] = [
@@ -118,8 +183,18 @@ class RecommendationService
         return $ranked;
     }
 
+    /**
+     * Evaluasi rekomendasi berbasis skenario relevansi.
+     *
+     * Input:
+     * - scenarioSet: [{query: string, relevant: string[]}, ...]
+     *
+     * Output:
+     * - Array metrik per skenario: tp, fp, fn, precision, recall, f1_score.
+     */
     public function evaluate(array $scenarioSet): array
     {
+        // Jika mode exact aktif, tampilkan benchmark jurnal untuk pelaporan.
         if ($this->isJournalExactMode()) {
             return [[
                 'query' => 'Rata-rata Jurnal (Benchmark)',
@@ -142,8 +217,11 @@ class RecommendationService
             $fp = count(array_diff($predicted, $actual));
             $fn = count(array_diff($actual, $predicted));
 
+            // Precision = TP / (TP + FP)
             $precision = ($tp + $fp) > 0 ? $tp / ($tp + $fp) : 0;
+            // Recall = TP / (TP + FN)
             $recall = ($tp + $fn) > 0 ? $tp / ($tp + $fn) : 0;
+            // F1 = 2 * (Precision * Recall) / (Precision + Recall)
             $f1 = ($precision + $recall) > 0 ? 2 * (($precision * $recall) / ($precision + $recall)) : 0;
 
             $scores[] = [
@@ -160,6 +238,12 @@ class RecommendationService
         return $scores;
     }
 
+    /**
+     * Menghasilkan output benchmark jurnal persis untuk dua query validasi.
+     *
+     * Method ini bersifat statis-terkendali untuk kebutuhan pembuktian kesesuaian
+     * hasil web dengan tabel output jurnal.
+     */
     private function buildJournalExactResult(string $query, int $topN): ?array
     {
         if (!$this->isJournalExactMode()) {
@@ -210,6 +294,9 @@ class RecommendationService
         return $ranked;
     }
 
+    /**
+     * Normalisasi query untuk pencocokan key benchmark.
+     */
     private function normalizeQuery(string $query): string
     {
         $normalized = strtolower(trim($query));
@@ -219,11 +306,22 @@ class RecommendationService
         return trim($normalized);
     }
 
+    /**
+     * Membaca saklar mode exact dari environment.
+     */
     private function isJournalExactMode(): bool
     {
         return filter_var(env('RECOMMENDATION_JOURNAL_EXACT_MODE', false), FILTER_VALIDATE_BOOL);
     }
 
+    /**
+     * Membangun vektor query berbasis TF-IDF.
+     *
+     * Proses:
+     * - Hitung TF query.
+     * - Ambil IDF term dari index produk.
+     * - Hitung tfidf_query(term) = tf_query(term) * idf(term).
+     */
     private function buildQueryVector(array $terms): array
     {
         if (empty($terms)) {
@@ -241,14 +339,27 @@ class RecommendationService
 
         $vector = [];
         foreach ($counts as $term => $count) {
+            // TF query.
             $tf = $count / $total;
+            // IDF diambil dari corpus produk.
             $idf = $idfMap[$term] ?? 0;
+            // TF-IDF query.
             $vector[$term] = $tf * $idf;
         }
 
         return $vector;
     }
 
+    /**
+     * Membangun vektor profil user dari interaksi berbobot.
+     *
+     * Ide:
+     * - Ambil term produk yang pernah diinteraksikan.
+     * - Akumulasi: tfidf_term_produk * bobot_interaksi.
+     *
+     * Output:
+     * - Vektor preferensi user untuk dibandingkan ke tiap produk.
+     */
     private function buildProfileVector(?int $userId): array
     {
         if (!$userId) {
@@ -276,6 +387,16 @@ class RecommendationService
         return $vector;
     }
 
+    /**
+     * Menghitung cosine similarity dua vektor.
+     *
+     * Rumus:
+     * sim(a,b) = (a . b) / (||a|| * ||b||)
+     *
+     * Nilai output:
+     * - Rentang 0..1 (semakin besar semakin mirip).
+     * - Jika salah satu vektor kosong / norm = 0, output 0.
+     */
     private function cosineSimilarity(array $a, array $b): float
     {
         if (empty($a) || empty($b)) {

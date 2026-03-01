@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\RecommendationAnalyticsController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\JournalValidationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\User\CartController;
@@ -97,4 +98,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/notifications', [AdminNotificationController::class, 'store'])->name('notifications.store');
 
     Route::get('/recommendation-analytics', [RecommendationAnalyticsController::class, 'index'])->name('recommendation-analytics');
+    Route::get('/journal-validation', [JournalValidationController::class, 'index'])->name('journal-validation');
 });
