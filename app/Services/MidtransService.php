@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Midtrans\Config;
 use Midtrans\Snap;
+use Midtrans\Transaction;
 
 class MidtransService
 {
@@ -25,5 +26,11 @@ class MidtransService
         $serverKey = config('services.midtrans.server_key');
         $expected = hash('sha512', $payload['order_id'].$payload['status_code'].$payload['gross_amount'].$serverKey);
         return hash_equals($expected, $payload['signature_key'] ?? '');
+    }
+
+    public function getTransactionStatus(string $orderId): array
+    {
+        $response = Transaction::status($orderId);
+        return json_decode(json_encode($response), true) ?: [];
     }
 }

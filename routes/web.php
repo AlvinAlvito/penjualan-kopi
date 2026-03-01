@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{invoice}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{invoice}/sync-payment', [OrderController::class, 'syncPayment'])->name('orders.sync-payment');
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/{product:slug}', [WishlistController::class, 'store'])->name('wishlist.store');

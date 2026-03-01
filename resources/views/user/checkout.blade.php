@@ -163,6 +163,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
 
         serviceSelect.disabled = false;
+
+        if (!selectedService && serviceSelect.options.length > 1) {
+            serviceSelect.selectedIndex = 1;
+        }
+
         const selected = serviceSelect.selectedOptions[0];
         shippingCostInput.value = selected ? Number(selected.dataset.cost || 0) : 0;
         updateTotals();

@@ -1,5 +1,26 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .chart-wrap {
+        position: relative;
+        height: 320px;
+        max-height: 320px;
+    }
+
+    .chart-wrap canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+    }
+
+    @media (max-width: 991px) {
+        .chart-wrap {
+            height: 260px;
+            max-height: 260px;
+        }
+    }
+</style>
+
 <h3 class="section-title">Admin Dashboard</h3>
 
 <div class="row g-3 mb-3">
@@ -32,7 +53,9 @@
         <div class="card-pro h-100">
             <div class="card-body">
                 <h5 class="fw-bold mb-3">Distribusi Status Order</h5>
-                <canvas id="orderStatusChart" height="180"></canvas>
+                <div class="chart-wrap">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -40,7 +63,9 @@
         <div class="card-pro h-100">
             <div class="card-body">
                 <h5 class="fw-bold mb-3">Top Produk Terjual</h5>
-                <canvas id="topProductsChart" height="180"></canvas>
+                <div class="chart-wrap">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
